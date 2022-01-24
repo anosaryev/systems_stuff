@@ -1,0 +1,54 @@
+# DEVLOG
+
+This DEVLOG lacks descriptiveness about specific functions created because most of them ended up getting deleted. Additionally, I did not modularise a lot. I think even now, I could be doing better in that department. Most of the functions were made in the last
+---
+
+#### Jan 11th
+Initial commit, proposal start.
+
+#### Jan 12th
+Initial (now scrapped) proposal finished.
+
+#### 13, 15-17 Jan
+I suffer with trying to make a simple systen where all messages travel up from the clients to the subservers to the servers.
+
+Also the 14th was a holiday for me so I didn't really work.
+
+#### Jan 18
+All hope was lost. I turned to the very thing I feared the most, **select**.
+
+I very quickly abandoned select.
+
+And then I remembered unnamed pipes existed!
+
+#### Jan 19
+
+I could now get a message from the client to the server. Then, I started to think about how this would work with multiple clients. There were multiple unavoidable issues. Firstly, if one began typing and then another were to send a message, would it display under the typer's current line on their terminal? Then when the typer sends, the messages would be in different orders on both screens. I figured that the only way around this was to have it so that anytime somebody sent a message, a chat log file updated, everybody's terminal windows cleared and the most recent messages in the chat log file newly displayed. That idea is well and good, but what about any messages that may have been in progress?
+
+#### 20 Jan
+
+At this point, I convinced myself that it wasn't possible to do it the way I intended to. I told myself that online chat rooms must have two processes running separately independently, input and output. This seems intuitive to me still, yet I can't say I know this for certain. Either way, I figured a chat log was not the way to go beacuse it would interrupt any active fgets-ing too drastically. Trying to think of a clever workaround, I thought of this hot potato-like idea. It would allow me to avoid having a chat log at all, as there would be no issues with message order if only one person could write at a time.
+
+Implementation was fine at first, but when it came to making the server both connect new clients and control the flow of messages between subservers (especially with this added hot potato rule), I quickly got stuck.
+
+Most of this thinking was done at my sister's birthday party, haha
+
+#### 21 Jan
+
+I accomplished nothing this day. I thought forking a subserver that could control chat flow might work, but quickly ran into a wall with distinguishing and connecting subsequent subservers from/to this chat flow one.
+
+For reference, by this date:
+- client.c had just client_connect() and main()
+- sec_server.c had just printe(), sighandler(), server_connect() which contained server_setup() and main()
+
+printe() is still entirely unused if I'm not mistaken. I had plans for it though.
+
+#### 22 Jan
+
+Looking up how to do multiple things with one process at once, I stumbled upon pthread. It seemed to do what I wanted, so after some further research and much thought about how to implement it, it started to work. I allocated memory so that both threads could share and modify it concurrently (to be fair, I don't know if this was necessary, but it felt like it was). Only now, after having code that was mostly untestable for so terribly long, I was running into a lot of errors.
+
+#### 23 Jan
+Hence a hectic and drawn out 23rd of January
+
+### 24 Jan
+...and 24th.

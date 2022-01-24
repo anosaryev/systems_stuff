@@ -1,62 +1,35 @@
-# 🔒 SecureChat 🔑
-_(tentatively)_
-
+# 🔥 HotPochato 🥔
+Not quite ready yet, but there's a groundwork, and I'm willing to work more
 ---
 
 ## Who's Involved?
 #### Anthony Nosaryev
 _Pd 5_
-
 ---
 
-## What is SecureChat?
-SecureChat is the **most secure** chatroom service available.
-Gone are the days of primitive servers cowering behind measly passwords.
-Gone is the dissatisfaction of a boring user experience.
+## What is HotPochato?
+Have you ever wanted to use a chat room, but *worse*?
+Have you ever been *bothered* by *freedom*?
+Have you ever started typing a message only for *somebody else* to send *theirs* before *you*, *advancing* the conversation *beyond your point*?
 
-SecureChat enables chatroom hosts to create time-limited*<sup>1</sup>, customisable*<sup>2,3</sup> and flexible*<sup>4,5</sup> security questions to prevent unwanted _types_ of users from accessing their services.
+HotPochato is the revolutionary new-very-bad-not-great-exceptionally-boring chat server that provides chatters to speak in an orderly, snail-paced fashion!
+---
 
-\*<sup>1</sup>: if I have the time and ability
+## What is HotPochato Really?
+So, this is very explicitly a different project from my initial proposal. For my initial proposal, I severely overestimated how easy it would be to make a *good* chat server that allows for multiple users. Such a chat room was always the goal (gimmick aside), and this strange approach is the closest I could get without resorting to overly-ludicrous methods.
 
-\*<sup>2</sup>: customisability includes answer length*<sup>3</sup>, case sensitivity*<sup>3</sup> and more*<sup>3</sup>
+I go over this in my DEVLOG, but my greatest difficulty with this project was constantly changing very crucial parts of my approach because things did not make sense. Eventually, I figured I had to use multithreading, something I was 99% unaware of until now (I can't say I've never heard the word).
 
-\*<sup>3</sup>: if I have the time and ability
+I am not done. I feel close to being done, but I don't know how many more errors may pop up, and this can certainly be optimised much more. As it is now, most of it seems to be operating as intended but there may be some read/write misplacement. The system works by having a thread of the server choose the next subserver, which will send its PID to its respetcive client to enable their messaging ability. Sometimes, this gets heaped in with the wrong read/write, causing it to not send at all or send at the end of a regular chat message.
 
-\*<sup>4</sup>: allowing for multiple answers, either by specific declaration*<sup>5</sup> or criteria checks*<sup>5</sup>
+If you will allow me, I will keep working on this and inform you when this is in better standing. I understand that the deadline is 24 Jan and no assignments are allowed after that date, but I would still appreciate the opportunity to improve this submission.
 
-\*<sup>5</sup>: if I have the time and ability
-
-## What is SecureChat Really?
-For this project, I decided to make a chat room with a highly customisable password system.
-
-I intend to implement a server with a TCP socketted connection as we have already done.
-
-Paired with the server would be a file containing the security prompts, answers and surrounding customisation options.
-Documentation for how this file is structured will be provided (possibly in the README), and I believe that this file will require manual customisation.
-
-Clients would connect to the server's listening socket, and upon establishing a connection, be prompted with security questions.
-After answering correctly, they will gain access to the chat room (or, upon answer incorrectly, lose their connection to the server).
-
-I anticipate that creating a functioning chat room will be more difficult for me than the security system because I am not very confident in my ability to connect multiple clients to the same server, but at the very least I hope to create a functioning chat room.
+All in all, I think I bit off more than I could chew with this one, but I'd still like to see it through.
+---
 
 ## What Systems Concepts Are (or could be) Involved?
-
-1. **Allocating Memory:** The socket process involves dynamic memory, and a stretch goal of mine is to enable users to alter security questions from the chat using commands, which would certainly involve more memory allocation.
-2. **Working With Files:** Security questions, answers and settings will be stored in one or multiple files and read after connection establishment.
-3. **Processes:** I believe that processes will still be involved despite seeking to connect my clients to the same server, though I am not entirely sure.
-4. **Semaphores:** As another stretch goal, I could implement semaphores to regulate the chatting process.
-5. **Sockets:** Duh
-
-## Expected Progress Timeline
-
-This is difficult to estimate because I do not know when this project is due (apologies if this was mentioned in class at any point).
-
-Nonetheless, I hope for the following:
-
-- **17 Jan:** Functioning base chat service
-
-- **18 Jan:** Security file outline planned
-
-- **21 Jan:** Security implemented after client-server connection
-
-**Any remaining time:** Bonus security options, semaphores and/or chat-based security alteration
+1. **Allocating Memory:** I allocate memory for different threads of the same process to modify the same memory and to allow for memory sharing across processes. 
+2. **Processes:** Much forking occurs.
+3. **Pipes:** Pipes facilitate server to subserver communication.
+4. **Sockets:** Sockets facilitate subserver to client communication.
+5. **PThread:** (honourary) PThreading enables the server to concurrently connect clients and control chatting.
