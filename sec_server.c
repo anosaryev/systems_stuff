@@ -51,7 +51,7 @@ void clienthandler(int client_socket, int ss2s[2], int s2ss[2]){
 
   printf("\tSS (%s): S and C Connected!\n", id); /**/
   write(client_socket, id, 12);
-  char *ready = "..";
+  char *ready = "->";
   char msg[USERLEN+2+INPLEN];
   printf("\tSS (%s): Online!\n", id); /**/
 
@@ -68,9 +68,8 @@ void clienthandler(int client_socket, int ss2s[2], int s2ss[2]){
 
     if (strchr(msg, ':')){
       write(ss2s[WRITE], ready, 2);
-      printf("\tSS (%s): Ready\n", id);
-    }
-    else if (!strcmp(id, msg)){ // this pid
+      printf("\tSS (%s): Sent [%s] to S\n", id, ready);
+    }else if (!strcmp(id, msg)){ // this pid
       memset(msg, 0, USERLEN+2+INPLEN);
       read(client_socket, msg, USERLEN+2+INPLEN);
       if (!strlen(msg)){
@@ -168,8 +167,8 @@ void *chathandler(void *ead){
 	  continue;
 	}
 	memset(ready, 0, 2);
-	read((ough->ssray[i]).ss2s, ready, 2);
-	printf("S: SS (%s) Ready: %s\n", pid, ready);
+	read((ough->ssray[j]).ss2s, ready, 2);
+	printf("S: Received [%s] from [%s]\n", ready, pid);
         memset(pid, 0, 12);
         sprintf(pid, "%d", (ough->ssray[j]).kid);
         printf("S: Sent [%s] to [%s]\n", msg, pid); /**/
