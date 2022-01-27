@@ -1,18 +1,23 @@
 # 🔥 HotPochato 🥔
 Not quite ready yet, but there's a groundwork, and I'm willing to work more
+
 ---
 
 ## Who's Involved?
 #### Anthony Nosaryev
 _Pd 5_
+
 ---
 
 ## What is HotPochato?
 Have you ever wanted to use a chat room, but *worse*?
+
 Have you ever been *bothered* by *freedom*?
+
 Have you ever started typing a message only for *somebody else* to send *theirs* before *you*, *advancing* the conversation *beyond your point*?
 
 HotPochato is the revolutionary new-very-bad-not-great-exceptionally-boring chat server that provides chatters to speak in an orderly, snail-paced fashion!
+
 ---
 
 ## What is HotPochato Really?
@@ -25,6 +30,7 @@ I am not done. I feel close to being done, but I don't know how many more errors
 If you will allow me, I will keep working on this and inform you when this is in better standing. I understand that the deadline is 24 Jan and no assignments are allowed after that date, but I would still appreciate the opportunity to improve this submission.
 
 All in all, I think I bit off more than I could chew with this one, but I'd still like to see it through.
+
 ---
 
 ## What Systems Concepts Are (or could be) Involved?
@@ -33,3 +39,5 @@ All in all, I think I bit off more than I could chew with this one, but I'd stil
 3. **Pipes:** Pipes facilitate server to subserver communication.
 4. **Sockets:** Sockets facilitate subserver to client communication.
 5. **PThread:** (honourary) PThreading enables the server to concurrently connect clients and control chatting.
+
+---
