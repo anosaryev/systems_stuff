@@ -23,34 +23,29 @@ char *msgcat(char *msg, char *user, char *line){
 }
 
 int client_connect() {
-  // Preliminary
   struct addrinfo * hints, * results;
   hints = calloc(1, sizeof(struct addrinfo));
   hints->ai_family = AF_INET;
-  hints->ai_socktype = SOCK_STREAM; // TCP
-  getaddrinfo("127.0.0.1", "12947", hints, &results);  // Client sets node to Server IP
+  hints->ai_socktype = SOCK_STREAM;
+  getaddrinfo("127.0.0.1", "12947", hints, &results);
 
-  // Socket
   int sd = socket(results->ai_family, results->ai_socktype, results->ai_protocol);
-
-  // Connect
   connect(sd, results->ai_addr, results->ai_addrlen);
 
   free(hints);
   freeaddrinfo(results);
-
   return sd;
 }
 
 int main() {
   system("clear");
 
-  char user[USERLEN+1] = {}; // extra for following while
+  char user[USERLEN+2] = {}; // little extra room
   char line[INPLEN+1] = {};
   char msg[USERLEN+2+INPLEN] = {}; // user: line
 
   while(strlen(user) == 0 || strlen(user) > USERLEN){
-    printf("Enter a username for this session.\n(up to %d characters, go beyond at your own peril):\n", USERLEN);
+    printf("Enter a username for this session.\n(up to %d characters, or go beyond at your own peril):\n", USERLEN);
     memset(user, 0, USERLEN+1);
     end_null(fgets(user, USERLEN, stdin));
   }
