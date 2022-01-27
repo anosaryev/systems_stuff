@@ -1,21 +1,10 @@
 #include "system.h"
 
-void printe(int b){
-  if (b == -1)
-    printf("Error %d: %s\n", errno, strerror(errno));
-}
-
 static void sighandler(int signo){
   if (signo == SIGINT){
     printf(".\n");
     exit(0);
   }
-}
-
-int ss_add(struct cons *ssray, int *ssnum, struct cons newss){
-  ssray[*ssnum] = newss;
-  *ssnum ++;
-  return 0;
 }
 
 int ss_rem(struct cons *ssray, int *ssnum, int index){
@@ -24,7 +13,7 @@ int ss_rem(struct cons *ssray, int *ssnum, int index){
   for (i = index; i < *ssnum-1; i ++){
     ssray[i] = ssray[i+1];
   }
-  *ssnum --;
+  *ssnum = *ssnum - 1;
   return pid;
 }
 
@@ -32,27 +21,69 @@ int server_setup() {
   system("clear");
   printf("S: Initiating!\n"); /**/
 
-  // Preliminary
   struct addrinfo * hints, * results;
   hints = calloc(1, sizeof(struct addrinfo));
   hints->ai_family = AF_INET;
-  hints->ai_socktype = SOCK_STREAM; // TCP
-  hints->ai_flags = AI_PASSIVE; // only needed on server
-  getaddrinfo(NULL, "12957", hints, &results);  // Server sets node to NULL
+  hints->ai_socktype = SOCK_STREAM;
+  hints->ai_flags = AI_PASSIVE;
+  getaddrinfo(NULL, "12947", hints, &results);
 
-  // Socket
   int sd = socket(results->ai_family, results->ai_socktype, results->ai_protocol);
 
-  // Bind
   bind(sd, results->ai_addr, results->ai_addrlen);
 
   free(hints);
   freeaddrinfo(results);
 
-  // Listen
   listen(sd, CLIENTNUM);
   printf("S: Online!\n"); /**/
   return sd;
+}
+
+void clienthandler(int client_socket, int ss2s[2], int s2ss[2]){
+  close(ss2s[READ]);
+  close(s2ss[WRITE]);
+
+  char id[12] = {};
+  sprintf(id, "%d", getpid());
+  printf("\tSS (%s): Forked!\n", id); /**/
+
+
+  printf("\tSS (%s): S and C Connected!\n", id); /**/
+  write(client_socket, id, 12);
+  char *ready = "..";
+  char msg[USERLEN+2+INPLEN];
+  printf("\tSS (%s): Online!\n", id); /**/
+
+  while(1){
+    memset(msg, 0, USERLEN+2+INPLEN);
+    read(s2ss[READ], msg, USERLEN+2+INPLEN);
+    printf("\tSS (%s): Received [%s] from S\n", id, msg); /**/
+
+    if (write(client_socket, msg, strlen(msg)+1) == -1){
+      printf("\tSS (%s): Connection to C Lost; Exiting\n", id); /**/
+      exit(0);
+    }
+    printf("\tSS (%s): Sent [%s] to C\n", id, msg); /**/
+
+    if (strchr(msg, ':')){
+      write(ss2s[WRITE], ready, 2);
+      printf("\tSS (%s): Ready\n", id);
+    }
+    else if (!strcmp(id, msg)){ // this pid
+      memset(msg, 0, USERLEN+2+INPLEN);
+      read(client_socket, msg, USERLEN+2+INPLEN);
+      if (!strlen(msg)){
+	printf("\tSS (%s): Connection to C Lost; Exiting\n", id); /**/
+	write(ss2s[WRITE], "\0", 1);
+	exit(0);
+      }
+      printf("\tSS (%s): Received [%s] from C\n", id, msg); /**/
+
+      write(ss2s[WRITE], msg, strlen(msg));
+      printf("\tSS (%s): Sent [%s] to S\n", id, msg); /**/
+    }
+  }
 }
 
 void *server_connect(void *ead) {
@@ -61,7 +92,7 @@ void *server_connect(void *ead) {
   socklen_t sock_size;
   struct sockaddr_storage client_address;
   sock_size = sizeof(client_address);
-  
+
   // Accept
 
   while (1){
@@ -76,40 +107,9 @@ void *server_connect(void *ead) {
     pipe(ss2s);
     pipe(s2ss);
     int pid = fork();
-    if (!pid){ // ss
-      printf("\tSS: Forked!\n"); /**/
-      struct conss *ssconss = calloc(1, 3*sizeof(int));
-      ssconss->sd = client_socket;
-      close(ss2s[READ]);
-      close(s2ss[WRITE]);
-      ssconss->ss2s = ss2s[WRITE];
-      ssconss->s2ss = s2ss[READ];
-      printf("\tSS: S and C Connected!\n"); /**/
-      printf("\tSS: Online!\n"); /**/
-
-      char msg[USERLEN+2+INPLEN];
-      char id[12] = {};
-      sprintf(id, "%d", getpid());
-      write(ssconss->sd, id, 12);
-      printf("oops\n");
-      
-      while(1){
-	strcpy(msg, "");
-	read(ssconss->s2ss, msg, USERLEN+2+INPLEN);
-	if (strchr(msg, ':')){ // external chat msg
-	  write(ssconss->sd, msg, strlen(msg)+1);
-	  continue;
-	}else{ // next chatter id
-	  if (!strcmp(id, msg)){ // matches this process
-	    write(ssconss->sd, msg, strlen(msg)+1);
-	    memset(msg, 0, USERLEN+2+INPLEN);
-	    read(ssconss->sd, msg, USERLEN+2+INPLEN);
-	    printf("\tSS: Received: [%s]\n", msg); /**/
-	    write(ssconss->ss2s, msg, strlen(msg)); //new
-	  }
-	}
-      }
-    }else{ // s
+    if (!pid) // ss
+      clienthandler(client_socket, ss2s, s2ss);
+    else{ // s
       close(ss2s[WRITE]);
       close(s2ss[READ]);
       (ough->ssray[*(ough->ssnum)]).kid = pid;
@@ -125,37 +125,54 @@ void *chathandler(void *ead){
   struct thr *ough = (struct thr *) ead;
   int i = -1;
   char pid[12];
+  char ready[2];
   char msg[USERLEN+2+INPLEN];
+
   while (1){
     while (*(ough->ssnum) > 0){
       int i = (i+1) % *(ough->ssnum);
-      strcpy(pid, "");
+      memset(pid, 0, 12);
       sprintf(pid, "%d", (ough->ssray[i]).kid);
-      printf("S: Empowering PID %s\n", pid);
       if (write((ough->ssray[i]).s2ss, pid, strlen(pid)) == -1){
+	printf("S: Removing SS [%d]\n", (ough->ssray[i]).kid); /**/
 	ss_rem(ough->ssray, ough->ssnum, i);
 	i --;
 	continue;
       }
-      strcpy(msg, "");
-      if (read((ough->ssray[i]).ss2s, msg, USERLEN+2+INPLEN) == -1){
+      printf("S: Sent [%s], a PID, to [%s]\n", pid, pid); /**/
+      //memset(ready, 0, 2);
+      //read((ough->ssray[i]).ss2s, ready, 2);
+      //printf("S: SS (%s) Ready: %s\n", pid, ready);
+      
+      memset(msg, 0, USERLEN+2+INPLEN);
+      read((ough->ssray[i]).ss2s, msg, USERLEN+2+INPLEN);
+      if (!strlen(msg)){
+	printf("S: Removing SS [%d]\n", (ough->ssray[i]).kid); /**/
 	ss_rem(ough->ssray, ough->ssnum, i);
 	i --;
 	continue;
       }
-      printf("S: Received [%s]\n", msg);
+      printf("S: Received [%s] from [%s]\n", msg, pid); /**/
+
       int j;
       for (j = i+1; j != i; j ++){
-	j %= *(ough->ssnum);
-	if (j == i)
-	  break;
-	if (write((ough->ssray[j]).s2ss, msg, strlen(msg)) == -1){
+        j %= *(ough->ssnum);
+        if (j == i)
+          break;
+        if (write((ough->ssray[j]).s2ss, msg, strlen(msg)) == -1){
+	  printf("S: Removing SS [%d]\n", (ough->ssray[j]).kid); /**/
 	  ss_rem(ough->ssray, ough->ssnum, j);
 	  if (i > j)
 	    i --;
 	  j --;
 	  continue;
 	}
+	memset(ready, 0, 2);
+	read((ough->ssray[i]).ss2s, ready, 2);
+	printf("S: SS (%s) Ready: %s\n", pid, ready);
+        memset(pid, 0, 12);
+        sprintf(pid, "%d", (ough->ssray[j]).kid);
+        printf("S: Sent [%s] to [%s]\n", msg, pid); /**/
       }
     }
   }
@@ -171,11 +188,10 @@ int main() {
   int *ssnum = calloc(1, sizeof(int));
 
   struct thr *ead = calloc(1, sizeof(struct thr));
-  //printf("up to\n");
   ead->sd = sd;
   ead->ssray = ssray;
   ead->ssnum = ssnum;
-  
+
   pthread_t connthread, chatthread;
 
   pthread_create(&connthread, NULL, server_connect, ead);

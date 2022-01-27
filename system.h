@@ -19,6 +19,7 @@
 #define CLIENTNUM 10
 #define INPLEN 100
 #define USERLEN 15
+#define CLDEBUG 0
 
 struct cons {int kid; int s2ss; int ss2s;};
 struct conss {int sd; int ss2s; int s2ss;};

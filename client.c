@@ -28,7 +28,7 @@ int client_connect() {
   hints = calloc(1, sizeof(struct addrinfo));
   hints->ai_family = AF_INET;
   hints->ai_socktype = SOCK_STREAM; // TCP
-  getaddrinfo("127.0.0.1", "12957", hints, &results);  // Client sets node to Server IP
+  getaddrinfo("127.0.0.1", "12947", hints, &results);  // Client sets node to Server IP
 
   // Socket
   int sd = socket(results->ai_family, results->ai_socktype, results->ai_protocol);
@@ -51,7 +51,7 @@ int main() {
 
   while(strlen(user) == 0 || strlen(user) > USERLEN){
     printf("Enter a username for this session.\n(up to %d characters, go beyond at your own peril):\n", USERLEN);
-    strcpy(user, "");
+    memset(user, 0, USERLEN+1);
     end_null(fgets(user, USERLEN, stdin));
   }
 
@@ -65,22 +65,25 @@ int main() {
   int sd = client_connect();
   char id[12] = {};
   read(sd, id, 12);
-  printf("PID: %s\n\n\n", id);
+  printf("PID: %s\n\n\n", id); /**/
 
   while (1){
-    strcpy(msg, "");
+    memset(msg, 0, USERLEN+2+INPLEN);
     read(sd, msg, USERLEN+2+INPLEN);
+    if (CLDEBUG)
+      printf("\t\t\tC: Received [%s] from [%s]\n", msg, id); /**/
     if (strchr(msg, ':')){ // external chat msg
-      printf("%s\n", msg); /**/
+      printf("%s\n\n", msg);
       continue;
-    }else{ // next chatter id
-      if (!strcmp(id, msg)){ // matches SS process
-	printf("%s: ", user); /**/
-	strcpy(line, "");
-	end_null(fgets(line, INPLEN, stdin)); /*|*/
-	msgcat(msg, user, line);
-	write(sd, msg, strlen(msg)+1);
-      }
+    }else if (!strcmp(id, msg)){ // matches SS PID
+      printf("%s: ", user);
+      memset(line, 0, INPLEN);
+      end_null(fgets(line, INPLEN, stdin));
+      printf("\n");
+      msgcat(msg, user, line);
+      write(sd, msg, strlen(msg));
+      if (CLDEBUG)
+	printf("\t\t\tC: Wrote [%s] to [%s]\n", msg, id); /**/
     }
   }
   return 0;
