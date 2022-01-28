@@ -1,7 +1,7 @@
 all: server client
 
-server: sec_server.c system.h
-	gcc -pthread -o server sec_server.c
+server: server.c system.h
+	gcc -pthread -o server server.c
 
 client: client.c system.h
 	gcc -o client client.c
