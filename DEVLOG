@@ -52,3 +52,6 @@ Hence a hectic and drawn out 23rd of January
 
 ### 24 Jan
 ...and 24th.
+
+### 25-27 Jan
+Still error checking. I failed to implement one solution, writing '0' or '1' from subservers to the server to indicate whether the client process terminated or not, but eventually realised that it didn't have to be so complicated. For an entire day, I was struggling to find another mistake, only to realise I wrote 'i' instead of 'j' somewhere at the end of serverchat, possibly the worst two characters to mix up. Oh well, we're done now :D
