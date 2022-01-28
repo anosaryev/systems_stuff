@@ -1,5 +1,4 @@
 # 🔥 HotPochato 🥔
-Not quite ready yet, but there's a groundwork, and I'm willing to work more
 
 ---
 
@@ -25,11 +24,7 @@ So, this is very explicitly a different project from my initial proposal. For my
 
 I go over this in my DEVLOG, but my greatest difficulty with this project was constantly changing very crucial parts of my approach because things did not make sense. Eventually, I figured I had to use multithreading, something I was 99% unaware of until now (I can't say I've never heard the word).
 
-I am not done. I feel close to being done, but I don't know how many more errors may pop up, and this can certainly be optimised much more. As it is now, most of it seems to be operating as intended but there may be some read/write misplacement. The system works by having a thread of the server choose the next subserver, which will send its PID to its respetcive client to enable their messaging ability. Sometimes, this gets heaped in with the wrong read/write, causing it to not send at all or send at the end of a regular chat message.
-
-If you will allow me, I will keep working on this and inform you when this is in better standing. I understand that the deadline is 24 Jan and no assignments are allowed after that date, but I would still appreciate the opportunity to improve this submission.
-
-All in all, I think I bit off more than I could chew with this one, but I'd still like to see it through.
+I finished this on the 27th of January, 3 days after the deadline. All in all, I think I bit off more than I could chew with this one, but it's done now.
 
 ---
 
