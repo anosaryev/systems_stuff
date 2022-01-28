@@ -33,6 +33,6 @@ I finished this on the 27th of January, 3 days after the deadline. All in all, I
 2. **Processes:** Much forking occurs.
 3. **Pipes:** Pipes facilitate server to subserver communication.
 4. **Sockets:** Sockets facilitate subserver to client communication.
-5. **PThread:** (honourary) PThreading enables the server to concurrently connect clients and control chatting.
+5. **PThread:** (honorary) PThreading enables the server to concurrently connect clients and control chatting.
 
 ---
